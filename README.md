@@ -100,4 +100,4 @@ We've prepared several issues for you to tackle! Look for `TODO` comments in `wh
 Please read our [CONTRIBUTING.md](./CONTRIBUTING.md) before submitting your first Pull Request.
 
 ---
-*Built with ❤️ for FOSS Weekend.*
+
