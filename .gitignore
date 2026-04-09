@@ -1,0 +1,33 @@
+# Dependencies
+**/node_modules
+**/.next
+**/.pnp
+.pnp.*
+
+# Build outputs
+**/target
+**/dist
+**/build
+**/out
+
+# Solana / Anchor
+**/.anchor
+**/test-ledger
+**/deploy/*.json
+
+# IDE / System
+.DS_Store
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env*
+.vercel
