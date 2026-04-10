@@ -1,26 +1,53 @@
 @import "tailwindcss";
 
+/* [FOSS ISSUE] Task 2: Dark/Amoled Toggle (Shh Mode)
+   Implement a high-contrast toggle that switches these variables 
+   to a deep amoled black (#000000) for a stealthy "Shh Mode". */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #020617;
+  --foreground: #f8fafc;
+  --accent: #22d3ee;
+  --card: rgba(15, 23, 42, 0.7);
+  --border: rgba(255, 255, 255, 0.1);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-card: var(--card);
+  --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Gradients */
+.bg-mesh {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(34, 211, 238, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(34, 211, 238, 0.05) 0px, transparent 50%);
+}
+
+.glass {
+  background: var(--card);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+}
+
+/* Hide Wallet Adapter UI Defaults if needed */
+.wallet-adapter-button {
+  background-color: #22d3ee !important;
+  color: #020617 !important;
+  font-weight: 600 !important;
+  border-radius: 9999px !important;
+  height: 44px !important;
 }

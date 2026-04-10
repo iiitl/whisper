@@ -1,0 +1,529 @@
+{
+  "address": "FkHX79Aq5SjuKcXorsTQsweUSNoqUUR3Wyu7DS3ECzo4",
+  "metadata": {
+    "name": "whisper",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "comment_confession",
+      "discriminator": [
+        65,
+        250,
+        249,
+        195,
+        157,
+        103,
+        7,
+        176
+      ],
+      "accounts": [
+        {
+          "name": "confession",
+          "writable": true
+        },
+        {
+          "name": "comment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "confession"
+              },
+              {
+                "kind": "account",
+                "path": "commenter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "commenter",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_confession",
+      "discriminator": [
+        180,
+        213,
+        113,
+        186,
+        231,
+        29,
+        191,
+        249
+      ],
+      "accounts": [
+        {
+          "name": "confession",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  101,
+                  115,
+                  115,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              },
+              {
+                "kind": "arg",
+                "path": "index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "author"
+              }
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "content_uri",
+          "type": "string"
+        },
+        {
+          "name": "index",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "delete_confession",
+      "docs": [
+        "[FOSS ISSUE] Beginner: Add logic to close the confession account and reclaim rent"
+      ],
+      "discriminator": [
+        230,
+        174,
+        214,
+        196,
+        52,
+        250,
+        228,
+        199
+      ],
+      "accounts": [
+        {
+          "name": "confession",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "confession"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "dislike_confession",
+      "docs": [
+        "[FOSS ISSUE] Beginner: Add logic to decrement the like counter"
+      ],
+      "discriminator": [
+        86,
+        117,
+        81,
+        141,
+        93,
+        118,
+        190,
+        207
+      ],
+      "accounts": [
+        {
+          "name": "confession",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "edit_confession",
+      "docs": [
+        "[FOSS ISSUE] Medium: Add logic to edit the confession content",
+        "Restricted to a 10-minute window from creation time.",
+        "Restricted to a 10-minute window from creation time for FOSS simplicity."
+      ],
+      "discriminator": [
+        226,
+        202,
+        113,
+        6,
+        161,
+        125,
+        241,
+        194
+      ],
+      "accounts": [
+        {
+          "name": "confession",
+          "writable": true
+        },
+        {
+          "name": "author",
+          "signer": true,
+          "relations": [
+            "confession"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_content_uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "initialize_user_counter",
+      "docs": [
+        "[FOSS ISSUE] Medium: Initialize the user counter for multiple confessions"
+      ],
+      "discriminator": [
+        97,
+        23,
+        209,
+        224,
+        1,
+        108,
+        45,
+        191
+      ],
+      "accounts": [
+        {
+          "name": "user_counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  95,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "like_confession",
+      "discriminator": [
+        72,
+        77,
+        60,
+        228,
+        163,
+        36,
+        92,
+        71
+      ],
+      "accounts": [
+        {
+          "name": "confession",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "tip_author",
+      "docs": [
+        "[FOSS ISSUE] Medium: Add logic to transfer SOL to the author"
+      ],
+      "discriminator": [
+        107,
+        52,
+        125,
+        82,
+        53,
+        113,
+        44,
+        36
+      ],
+      "accounts": [
+        {
+          "name": "confession",
+          "writable": true
+        },
+        {
+          "name": "tipper",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "author",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "_amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "CommentAccount",
+      "discriminator": [
+        42,
+        146,
+        173,
+        246,
+        2,
+        22,
+        223,
+        91
+      ]
+    },
+    {
+      "name": "ConfessionAccount",
+      "discriminator": [
+        113,
+        124,
+        26,
+        51,
+        214,
+        56,
+        112,
+        118
+      ]
+    },
+    {
+      "name": "UserCounter",
+      "discriminator": [
+        154,
+        114,
+        103,
+        93,
+        77,
+        57,
+        80,
+        227
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ContentUriTooLong",
+      "msg": "Content URI exceeds maximum allowed length"
+    },
+    {
+      "code": 6001,
+      "name": "EmptyContentUri",
+      "msg": "Content URI cannot be empty"
+    },
+    {
+      "code": 6002,
+      "name": "LikeCountOverflow",
+      "msg": "Like count overflow"
+    },
+    {
+      "code": 6003,
+      "name": "CommentCountOverflow",
+      "msg": "Comment count overflow"
+    }
+  ],
+  "types": [
+    {
+      "name": "CommentAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "confession",
+            "type": "pubkey"
+          },
+          {
+            "name": "commenter",
+            "type": "pubkey"
+          },
+          {
+            "name": "content_uri",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConfessionAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "author",
+            "type": "pubkey"
+          },
+          {
+            "name": "content_uri",
+            "type": "string"
+          },
+          {
+            "name": "like_count",
+            "type": "u64"
+          },
+          {
+            "name": "comment_count",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "index",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserCounter",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "count",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

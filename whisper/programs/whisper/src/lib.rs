@@ -3,7 +3,7 @@
 // ============================================
 use anchor_lang::prelude::*;
 
-declare_id!("DHTV8Z1MNm7C5vNX5mUrR1QdNzipbytaHFimTZbycH9R");
+declare_id!("FkHX79Aq5SjuKcXorsTQsweUSNoqUUR3Wyu7DS3ECzo4");
 
 #[program]
 pub mod whisper {
@@ -12,6 +12,7 @@ pub mod whisper {
     pub fn create_confession(
         ctx: Context<CreateConfession>,
         content_uri: String,
+        index: u64,
     ) -> Result<()> {
         require!(
             content_uri.len() <= ConfessionAccount::MAX_URI_LENGTH,
@@ -20,6 +21,7 @@ pub mod whisper {
         require!(!content_uri.is_empty(), WhisperError::EmptyContentUri);
 
         let confession = &mut ctx.accounts.confession;
+        let user_counter = &mut ctx.accounts.user_counter;
         let clock = Clock::get()?;
 
         confession.author = ctx.accounts.author.key();
@@ -27,9 +29,13 @@ pub mod whisper {
         confession.like_count = 0;
         confession.comment_count = 0;
         confession.timestamp = clock.unix_timestamp;
+        confession.index = user_counter.count; // Store current index
         confession.bump = ctx.bumps.confession;
 
-        msg!("Confession created: {}", confession.key());
+        // Increment the user's total confession count
+        user_counter.count = user_counter.count.checked_add(1).unwrap();
+
+        msg!("Confession created at index: {}", confession.index);
         Ok(())
     }
 
@@ -74,35 +80,44 @@ pub mod whisper {
         Ok(())
     }
 
-    /// [FOSS ISSUE] Beginner: Add logic to close the confession account and reclaim rent
+    /// [FOSS ISSUE] Task 1: Account Lifecycle (Beginner)
+    /// Implement the instruction to close a confession account and reclaim rent (SOL).
+    /// Hint: Use Anchor's `close = author` constraint or manual account closing logic.
     pub fn delete_confession(_ctx: Context<DeleteConfession>) -> Result<()> {
-        // TODO: Use Anchor's `close` constraint or manual account closing logic
         Ok(())
     }
 
-    /// [FOSS ISSUE] Beginner: Add logic to decrement the like counter
+    /// [FOSS ISSUE] Task 1: Account Lifecycle (Beginner)
+    /// Implement logic to safely decrement the like counter.
     pub fn dislike_confession(_ctx: Context<DislikeConfession>) -> Result<()> {
-        // TODO: Implement decrement logic with safety checks
+        msg!("Dislike logic pending implementation.");
         Ok(())
     }
 
-    /// [FOSS ISSUE] Medium: Add logic to edit the confession content
-    /// Restricted to a 10-minute window from creation time.
+    /// [FOSS ISSUE] Task 2: Edit Logic (Junior+)
+    /// Implement the logic to update content_uri. 
+    /// Advanced: Restrict edits to a 10-minute window from creation time.
     pub fn edit_confession(
-        _ctx: Context<EditConfession>,
-        _new_content_uri: String,
+        ctx: Context<EditConfession>,
+        new_content_uri: String,
     ) -> Result<()> {
-        // TODO: Check clock.unix_timestamp against account creation timestamp
+        require!(
+            new_content_uri.len() <= ConfessionAccount::MAX_URI_LENGTH,
+            WhisperError::ContentUriTooLong
+        );
+        let confession = &mut ctx.accounts.confession;
+        confession.content_uri = new_content_uri;
+        msg!("Confession updated: {}", confession.key());
         Ok(())
     }
 
-    /// [FOSS ISSUE] Medium: Add logic to transfer SOL to the author
+    /// [FOSS ISSUE] Task 3: Tipping System (Junior+)
+    /// Transfer SOL from tipper to author via system_program CPI.
     pub fn tip_author(_ctx: Context<TipAuthor>, _amount: u64) -> Result<()> {
-        // TODO: Transfer SOL from tipper to author via system_program CPI
+        // TODO: Transfer SOL from tipper to author
         Ok(())
     }
 
-    /// [FOSS ISSUE] Medium: Initialize the user counter for multiple confessions
     pub fn initialize_user_counter(ctx: Context<InitializeUserCounter>) -> Result<()> {
         let user_counter = &mut ctx.accounts.user_counter;
         user_counter.count = 0;
@@ -122,12 +137,13 @@ pub struct ConfessionAccount {
     pub like_count: u64,
     pub comment_count: u64,
     pub timestamp: i64,
+    pub index: u64, // The index of this confession for the user
     pub bump: u8,
 }
 
 impl ConfessionAccount {
     pub const MAX_URI_LENGTH: usize = 200;
-    pub const SPACE: usize = 8 + 32 + 4 + Self::MAX_URI_LENGTH + 8 + 8 + 8 + 1;
+    pub const SPACE: usize = 8 + 32 + 4 + Self::MAX_URI_LENGTH + 8 + 8 + 8 + 8 + 1;
 }
 
 #[account]
@@ -159,7 +175,7 @@ impl UserCounter {
 // ============================================
 
 #[derive(Accounts)]
-#[instruction(content_uri: String)]
+#[instruction(content_uri: String, index: u64)]
 pub struct CreateConfession<'info> {
     #[account(
         init,
@@ -168,10 +184,20 @@ pub struct CreateConfession<'info> {
         seeds = [
             b"confession",
             author.key().as_ref(),
+            index.to_le_bytes().as_ref(),
         ],
         bump
     )]
-    pub confession: Account<'info, ConfessionAccount>,
+    pub confession: Box<Account<'info, ConfessionAccount>>,
+
+    #[account(
+        init_if_needed,
+        payer = author,
+        space = UserCounter::SPACE,
+        seeds = [b"user_counter", author.key().as_ref()],
+        bump
+    )]
+    pub user_counter: Box<Account<'info, UserCounter>>,
 
     #[account(mut)]
     pub author: Signer<'info>,
@@ -213,24 +239,37 @@ pub struct CommentConfession<'info> {
 }
 
 #[derive(Accounts)]
-pub struct DeleteConfession {
-    // TODO: Define keys needed for closing account
-    // Hint: mutation access to confession, author as receiver
+pub struct DeleteConfession<'info> {
+    #[account(mut, has_one = author)]
+    pub confession: Account<'info, ConfessionAccount>,
+    #[account(mut)]
+    pub author: Signer<'info>,
 }
 
 #[derive(Accounts)]
-pub struct DislikeConfession {
-    // TODO: Define keys needed for liking logic
+pub struct DislikeConfession<'info> {
+    #[account(mut)]
+    pub confession: Account<'info, ConfessionAccount>,
+    pub user: Signer<'info>,
 }
 
 #[derive(Accounts)]
-pub struct EditConfession {
-    // TODO: Define keys needed for editing logic
+pub struct EditConfession<'info> {
+    #[account(mut, has_one = author)]
+    pub confession: Account<'info, ConfessionAccount>,
+    pub author: Signer<'info>,
 }
 
 #[derive(Accounts)]
-pub struct TipAuthor {
-    // TODO: Define keys needed for tipping logic (tipper, author, etc)
+pub struct TipAuthor<'info> {
+    #[account(mut)]
+    pub confession: Account<'info, ConfessionAccount>,
+    #[account(mut)]
+    pub tipper: Signer<'info>,
+    /// CHECK: This is the recipient of the tip
+    #[account(mut)]
+    pub author: AccountInfo<'info>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
