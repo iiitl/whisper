@@ -3,7 +3,7 @@
 // ============================================
 use anchor_lang::prelude::*;
 
-declare_id!("FkHX79Aq5SjuKcXorsTQsweUSNoqUUR3Wyu7DS3ECzo4");
+declare_id!("GqU5afciisbVYRDxX7m59anb8qXmpYAmuXMqLiq4KJsc");
 
 #[program]
 pub mod whisper {
@@ -41,7 +41,7 @@ pub mod whisper {
 
     pub fn like_confession(ctx: Context<LikeConfession>) -> Result<()> {
         let confession = &mut ctx.accounts.confession;
-        
+
         confession.like_count = confession
             .like_count
             .checked_add(1)
@@ -51,10 +51,7 @@ pub mod whisper {
         Ok(())
     }
 
-    pub fn comment_confession(
-        ctx: Context<CommentConfession>,
-        content_uri: String,
-    ) -> Result<()> {
+    pub fn comment_confession(ctx: Context<CommentConfession>, content_uri: String) -> Result<()> {
         require!(
             content_uri.len() <= CommentAccount::MAX_URI_LENGTH,
             WhisperError::ContentUriTooLong
@@ -95,12 +92,9 @@ pub mod whisper {
     }
 
     /// [FOSS ISSUE] Task 2: Edit Logic (Junior+)
-    /// Implement the logic to update content_uri. 
+    /// Implement the logic to update content_uri.
     /// Advanced: Restrict edits to a 10-minute window from creation time.
-    pub fn edit_confession(
-        ctx: Context<EditConfession>,
-        new_content_uri: String,
-    ) -> Result<()> {
+    pub fn edit_confession(ctx: Context<EditConfession>, new_content_uri: String) -> Result<()> {
         require!(
             new_content_uri.len() <= ConfessionAccount::MAX_URI_LENGTH,
             WhisperError::ContentUriTooLong
@@ -240,8 +234,9 @@ pub struct CommentConfession<'info> {
 
 #[derive(Accounts)]
 pub struct DeleteConfession<'info> {
-    #[account(mut, has_one = author)]
+    #[account(mut, has_one = author, close = author)]
     pub confession: Account<'info, ConfessionAccount>,
+
     #[account(mut)]
     pub author: Signer<'info>,
 }
@@ -297,13 +292,13 @@ pub struct InitializeUserCounter<'info> {
 pub enum WhisperError {
     #[msg("Content URI exceeds maximum allowed length")]
     ContentUriTooLong,
-    
+
     #[msg("Content URI cannot be empty")]
     EmptyContentUri,
-    
+
     #[msg("Like count overflow")]
     LikeCountOverflow,
-    
+
     #[msg("Comment count overflow")]
     CommentCountOverflow,
 }
