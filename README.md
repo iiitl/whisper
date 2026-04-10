@@ -4,7 +4,20 @@ Whisper is a decentralized confession platform built on **Solana** and **Arweave
 
 ![architecture](image.png)
 
-## 🚀 Quick Start (Setup Guide)
+## 📋 Prerequisites (Juniors Start Here!)
+
+Before you can test or contribute, make sure you have the following:
+
+1.  **Phantom Wallet**: [Install the extension](https://phantom.app/) and create a wallet.
+2.  **Switch to Devnet**: 
+    - Open Phantom Settings > Developer Settings > **Change Network**.
+    - Select **Solana Devnet**.
+3.  **Devnet SOL**: You need "fake" money to pay for transactions. Get it from the [Solana Faucet](https://faucet.solana.com/).
+4.  **Local Environment**: Rust, Solana CLI, and Anchor installed (refer to [Solana Docs](https://docs.solana.com/developer/installation)).
+
+---
+
+## Quick Start (Setup Guide)
 
 Follow these steps to get the project running locally for **FOSS Weekend**.
 
@@ -25,17 +38,17 @@ npm run dev
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 - **Solana (Anchor)**: Manages metadata, PDA derived addresses, and reaction counts.
 - **Arweave (Irys)**: Permanent storage for the encrypted or raw confession text.
 - **Next.js**: Premium UI for secret discovery and interaction.
 
-## 📝 Roadmap & Tasks
+## Roadmap & Tasks
 Specific tasks for contributors are tagged with `[FOSS ISSUE]` directly in the source code. 
 - **Rust Tasks**: `whisper/programs/whisper/src/lib.rs` (3 Issues)
 - **Frontend Tasks**: Search for the tags in the `/frontend` components (6 Issues)
 
-## 🤝 Contribution
+## Contribution
 Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for the workflow before submitting your first PR.
 
 ---
