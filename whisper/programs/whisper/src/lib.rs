@@ -116,6 +116,22 @@ pub mod whisper {
     /// Transfer SOL from tipper to author via system_program CPI.
     pub fn tip_author(_ctx: Context<TipAuthor>, _amount: u64) -> Result<()> {
         // TODO: Transfer SOL from tipper to author
+        let ix = anchor_lang::solana_program::system_instruction::transfer(
+            &ctx.accounts.tipper.key(),
+            &ctx.accounts.author.key(),
+            amount,
+        );
+
+        anchor_lang::solana_program::program::invoke(
+            &ix,
+            &[
+                ctx.accounts.tipper.to_account_info(),
+                ctx.accounts.author.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+            ],
+        )?;
+
+        msg!("Tip of {} lamports sent to author!", amount);
         Ok(())
     }
 
