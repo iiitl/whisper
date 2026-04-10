@@ -89,8 +89,9 @@ pub mod whisper {
 
     /// [FOSS ISSUE] Task 1: Account Lifecycle (Beginner)
     /// Implement logic to safely decrement the like counter.
-    pub fn dislike_confession(_ctx: Context<DislikeConfession>) -> Result<()> {
-        msg!("Dislike logic pending implementation.");
+    pub fn dislike_confession(ctx: Context<DislikeConfession>) -> Result<()> {
+        let confession = &mut ctx.accounts.confession;
+        confession.like_count = confession.like_count.checked_sub(1).unwrap_or(0);
         Ok(())
     }
 
