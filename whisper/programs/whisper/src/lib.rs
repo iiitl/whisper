@@ -94,13 +94,23 @@ pub mod whisper {
     /// [FOSS ISSUE] Task 2: Edit Logic (Junior+)
     /// Implement the logic to update content_uri.
     /// Advanced: Restrict edits to a 10-minute window from creation time.
+    /// Solved !
     pub fn edit_confession(ctx: Context<EditConfession>, new_content_uri: String) -> Result<()> {
         require!(
             new_content_uri.len() <= ConfessionAccount::MAX_URI_LENGTH,
             WhisperError::ContentUriTooLong
         );
+
         let confession = &mut ctx.accounts.confession;
+        let clock = Clock::get()?;
+
+        require!(
+            clock.unix_timestamp - confession.timestamp <= 600,
+            WhisperError::EditWindowExpired
+        );
+
         confession.content_uri = new_content_uri;
+
         msg!("Confession updated: {}", confession.key());
         Ok(())
     }
@@ -301,4 +311,7 @@ pub enum WhisperError {
 
     #[msg("Comment count overflow")]
     CommentCountOverflow,
+
+    #[msg("Edit window has expired")]
+    EditWindowExpired,
 }
