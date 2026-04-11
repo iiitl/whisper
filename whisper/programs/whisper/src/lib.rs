@@ -107,6 +107,15 @@ pub mod whisper {
             WhisperError::ContentUriTooLong
         );
         let confession = &mut ctx.accounts.confession;
+
+        let clock = Clock::get()?;
+        let current_timestamp = clock.unix_timestamp;
+
+        require!(
+            current_timestamp - confession.timestamp <= 600,
+            WhisperError::EditWindowExpired
+        );
+        
         confession.content_uri = new_content_uri;
         msg!("Confession updated: {}", confession.key());
         Ok(())
@@ -307,4 +316,7 @@ pub enum WhisperError {
     
     #[msg("Comment count overflow")]
     CommentCountOverflow,
+
+    #[msg("The 10-minute edit window has expired")]
+    EditWindowExpired,
 }
