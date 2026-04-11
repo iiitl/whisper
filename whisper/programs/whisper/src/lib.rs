@@ -3,7 +3,7 @@
 // ============================================
 use anchor_lang::prelude::*;
 
-declare_id!("FkHX79Aq5SjuKcXorsTQsweUSNoqUUR3Wyu7DS3ECzo4");
+declare_id!("DK1xskFZBzR7SXcEF54SyskAmEEhBsRF5Hxc1wU2gW17");
 
 #[program]
 pub mod whisper {
